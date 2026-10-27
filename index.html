@@ -182,5 +182,33 @@
     <p>Biblioteca Digital &middot; Proyecto de Programación Web con HTML, CSS y JavaScript</p>
   </footer>
 
+  <div class="modal" id="modal-prestar" hidden>
+    <div class="modal__caja" role="dialog" aria-modal="true" aria-labelledby="modal-prestar-titulo">
+      <h2 id="modal-prestar-titulo">Prestar libro</h2>
+      <p id="modal-prestar-libro" class="modal__texto"></p>
+      <form id="formulario-prestar" novalidate>
+        <div class="campo">
+          <label for="prestar-persona">¿A quién se presta? (de 2 a 40 caracteres)</label>
+          <input type="text" id="prestar-persona" name="persona" autocomplete="off" aria-describedby="error-prestar">
+          <p class="error" id="error-prestar"></p>
+        </div>
+        <div class="modal__acciones">
+          <button type="button" class="boton boton--secundario" data-accion="cancelar-modal">Cancelar</button>
+          <button type="submit" class="boton boton--primario">Prestar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="modal-eliminar" hidden>
+    <div class="modal__caja" role="alertdialog" aria-modal="true" aria-labelledby="modal-eliminar-titulo" aria-describedby="modal-eliminar-texto">
+      <h2 id="modal-eliminar-titulo">¿Eliminar libro?</h2>
+      <p id="modal-eliminar-texto" class="modal__texto">Se eliminará también su historial de préstamos devueltos. Esta acción no se puede deshacer.</p>
+      <div class="modal__acciones">
+        <button type="button" class="boton boton--secundario" data-accion="cancelar-modal">Cancelar</button>
+        <button type="button" class="boton boton--peligro" id="btn-confirmar-eliminar">Eliminar</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

@@ -128,6 +128,7 @@ const UI = (() => {
       acciones.append(crearBoton('Prestar', 'prestar', libro.id, { clase: 'boton--primario', titulo: libro.titulo, deshabilitado: estado === 'coleccion' }));
     }
     acciones.append(crearBoton('Editar', 'editar', libro.id, { titulo: libro.titulo }));
+    acciones.append(crearBoton('Eliminar', 'eliminar', libro.id, { clase: 'boton--peligro', titulo: libro.titulo }));
 
     return el(
       'article',
@@ -315,6 +316,75 @@ const UI = (() => {
     $('busqueda').value = texto;
   }
 
+  let modalAbierto = null;
+  let elementoPrevio = null;
+
+  const SELECTOR_ENFOCABLES = 'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [href]';
+
+  function abrirModal(modal, elementoInicial) {
+    elementoPrevio = document.activeElement;
+    modalAbierto = modal;
+    modal.hidden = false;
+    elementoInicial.focus();
+  }
+
+  function cerrarModal() {
+    if (!modalAbierto) return;
+    modalAbierto.hidden = true;
+    modalAbierto = null;
+    if (elementoPrevio && document.contains(elementoPrevio)) {
+      elementoPrevio.focus();
+    } else {
+      $('contenido').focus({ preventScroll: true });
+    }
+    elementoPrevio = null;
+  }
+
+  function hayModalAbierto() {
+    return modalAbierto !== null;
+  }
+
+  function atraparFoco(evento) {
+    if (!modalAbierto || evento.key !== 'Tab') return;
+    const enfocables = modalAbierto.querySelectorAll(SELECTOR_ENFOCABLES);
+    const primero = enfocables[0];
+    const ultimo = enfocables[enfocables.length - 1];
+    if (evento.shiftKey && document.activeElement === primero) {
+      evento.preventDefault();
+      ultimo.focus();
+    } else if (!evento.shiftKey && document.activeElement === ultimo) {
+      evento.preventDefault();
+      primero.focus();
+    }
+  }
+
+  function abrirModalPrestar(titulo, nombrePrellenado) {
+    $('modal-prestar-libro').textContent = `Libro: «${titulo}»`;
+    $('prestar-persona').value = nombrePrellenado;
+    mostrarErrorPrestar('');
+    abrirModal($('modal-prestar'), $('prestar-persona'));
+    $('prestar-persona').select();
+  }
+
+  function leerPersonaPrestar() {
+    return $('prestar-persona').value;
+  }
+
+  function mostrarErrorPrestar(texto) {
+    $('error-prestar').textContent = texto;
+    if (texto) {
+      $('prestar-persona').setAttribute('aria-invalid', 'true');
+      $('prestar-persona').focus();
+    } else {
+      $('prestar-persona').removeAttribute('aria-invalid');
+    }
+  }
+
+  function abrirModalEliminar(titulo) {
+    $('modal-eliminar-titulo').textContent = `¿Eliminar «${titulo}»?`;
+    abrirModal($('modal-eliminar'), document.querySelector('#modal-eliminar [data-accion="cancelar-modal"]'));
+  }
+
   return {
     mostrarVista,
     enfocarTituloVista,
@@ -341,5 +411,12 @@ const UI = (() => {
     renderResumen,
     renderUsuario,
     mostrarErrorUsuario,
+    hayModalAbierto,
+    cerrarModal,
+    atraparFoco,
+    abrirModalPrestar,
+    leerPersonaPrestar,
+    mostrarErrorPrestar,
+    abrirModalEliminar
   };
 })();

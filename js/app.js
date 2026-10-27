@@ -16,6 +16,8 @@
     usuario: '',
     tema: 'claro',
     editandoId: null
+    ,
+    modalLibroId: null
   };
 
   function guardar() {
@@ -129,12 +131,8 @@
       UI.mostrarMensaje('error', permitido.error);
       return;
     }
-    const persona = Logica.validarPersona(app.usuario);
-    if (!persona.valido) {
-      UI.mostrarMensaje('error', `Antes de prestar, escribe tu nombre en «Resumen y ajustes» (de ${Logica.PERSONA_MIN} a ${Logica.PERSONA_MAX} caracteres).`);
-      return;
-    }
-    completarPrestamo(idLibro, persona.valor);
+    app.modalLibroId = idLibro;
+    UI.abrirModalPrestar(permitido.libro.titulo, app.usuario);
   }
 
   function accionDevolver(idLibro) {
@@ -162,6 +160,49 @@
     UI.actualizarContador(Logica.COMENTARIO_MAX);
     UI.modoFormulario(true);
     irA('libro');
+  }
+
+  function accionEliminar(idLibro) {
+    const libro = estado.libros.find((l) => l.id === idLibro);
+    if (!libro) return;
+    if (Logica.prestamoActivo(estado.prestamos, idLibro)) {
+      UI.mostrarMensaje('error', `No se puede eliminar «${libro.titulo}» porque tiene un préstamo activo. Devuélvelo primero.`);
+      return;
+    }
+    app.modalLibroId = idLibro;
+    UI.abrirModalEliminar(libro.titulo);
+  }
+
+  function confirmarEliminar() {
+    const idLibro = app.modalLibroId;
+    UI.cerrarModal();
+    app.modalLibroId = null;
+    const resultado = Logica.eliminarLibro(estado, idLibro);
+    if (!resultado.ok) {
+      UI.mostrarMensaje('error', resultado.error);
+      return;
+    }
+    if (app.editandoId === idLibro) cancelarEdicion();
+    guardar();
+    render();
+    UI.mostrarMensaje('exito', `«${resultado.libro.titulo}» se eliminó junto con su historial de préstamos.`);
+  }
+
+  function enviarPrestamoDesdeModal() {
+    const persona = Logica.validarPersona(UI.leerPersonaPrestar());
+    if (!persona.valido) {
+      UI.mostrarErrorPrestar(persona.error);
+      return;
+    }
+    const idLibro = app.modalLibroId;
+    UI.cerrarModal();
+    app.modalLibroId = null;
+    completarPrestamo(idLibro, persona.valor);
+  }
+
+  function cerrarModal() {
+    UI.cerrarModal();
+    app.modalLibroId = null;
   }
 
   function cancelarEdicion() {
@@ -277,6 +318,8 @@
       prestar: accionPrestar,
       devolver: accionDevolver,
       editar: accionEditar
+      ,
+      eliminar: accionEliminar
     };
     ['lista-libros', 'lista-prestamos'].forEach((id) => {
       $(id).addEventListener('click', (evento) => {
@@ -299,8 +342,25 @@
     $('btn-restablecer').addEventListener('click', restablecer);
     document.querySelectorAll('[data-accion="tema"]').forEach((boton) => boton.addEventListener('click', alternarTema));
 
+    document.querySelectorAll('[data-accion="cancelar-modal"]').forEach((boton) => boton.addEventListener('click', cerrarModal));
+    document.querySelectorAll('.modal').forEach((modal) => {
+      modal.addEventListener('click', (evento) => {
+        if (evento.target === modal) cerrarModal();
+      });
+    });
+    $('formulario-prestar').addEventListener('submit', (evento) => {
+      evento.preventDefault();
+      enviarPrestamoDesdeModal();
+    });
+    $('btn-confirmar-eliminar').addEventListener('click', confirmarEliminar);
+    document.addEventListener('keydown', UI.atraparFoco);
+
     document.addEventListener('keydown', (evento) => {
       if (evento.key !== 'Escape') return;
+      if (UI.hayModalAbierto()) {
+        cerrarModal();
+        return;
+      }
       if (app.vista === 'libro') {
         cancelarEdicion();
         UI.enfocarCampo('titulo');
