@@ -66,6 +66,14 @@ const UI = (() => {
     $('saludo').textContent = `Hola, ${usuario || 'visitante'}`;
   }
 
+  function aplicarTema(tema) {
+    document.documentElement.dataset.tema = tema;
+    const siguiente = tema === 'oscuro' ? 'claro' : 'oscuro';
+    document.querySelectorAll('[data-accion="tema"]').forEach((boton) => {
+      boton.textContent = boton.dataset.formato === 'corto' ? `Tema ${siguiente}` : `Cambiar a tema ${siguiente}`;
+    });
+  }
+
   function renderGeneros(generos, seleccionado) {
     const select = $('filtro-genero');
     const opciones = [el('option', { texto: 'Todos los géneros', attrs: { value: 'todos' } })];
@@ -313,6 +321,7 @@ const UI = (() => {
     mostrarMensaje,
     limpiarMensaje,
     renderMenu,
+    aplicarTema,
     renderGeneros,
     renderBotonesEstado,
     renderControlesOrden,

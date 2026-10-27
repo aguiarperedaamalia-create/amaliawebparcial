@@ -9,7 +9,7 @@
   <meta name="author" content="Biblioteca Digital">
   <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#1d4e89">
-  <meta name="color-scheme" content="light">
+  <meta name="color-scheme" content="light dark">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Biblioteca Digital">
   <meta property="og:description" content="Catálogo de libros con préstamos, devoluciones e historial.">
@@ -19,6 +19,7 @@
   <script defer src="js/fechas.js"></script>
   <script defer src="js/logica.js"></script>
   <script defer src="js/datos.js"></script>
+  <script defer src="js/almacenamiento.js"></script>
   <script defer src="js/ui.js"></script>
   <script defer src="js/app.js"></script>
 </head>
@@ -40,6 +41,7 @@
     </nav>
     <div class="cabecera__usuario">
       <p class="saludo" id="saludo">Hola, visitante</p>
+      <button type="button" class="boton boton--secundario boton--pequeno" data-accion="tema" data-formato="corto">Tema oscuro</button>
     </div>
   </header>
 
@@ -154,6 +156,10 @@
 
       <h3 class="vista__subtitulo">Ajustes</h3>
       <div class="ajustes">
+        <div class="ajuste">
+          <h4>Tema de la interfaz</h4>
+          <button type="button" class="boton boton--secundario" data-accion="tema" data-formato="largo">Cambiar a tema oscuro</button>
+        </div>
         <form id="formulario-usuario" class="ajuste" novalidate>
           <h4>Nombre de usuario</h4>
           <div class="campo">

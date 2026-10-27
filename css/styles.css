@@ -45,6 +45,51 @@
   --ancho-max: 1120px;
 }
 
+:root[data-tema="oscuro"] {
+  --fondo: #11151b;
+  --superficie: #1a212b;
+  --superficie-alt: #242d3a;
+  --texto: #e8ecf2;
+  --texto-suave: #b0bac8;
+  --borde: #3a4556;
+  --primario: #8bb9ff;
+  --primario-hover: #b3d0ff;
+  --sobre-primario: #0b1220;
+  --peligro: #ff9d96;
+  --peligro-hover: #ffc0bb;
+  --sobre-peligro: #2a0a08;
+  --foco: #ffb454;
+  --error: #ff9d96;
+  --alerta: #ffb3ad;
+
+  --disponible-fondo: #17402a;
+  --disponible-texto: #b9f0cd;
+  --prestado-fondo: #4a3210;
+  --prestado-texto: #ffdca6;
+  --prestado-borde: #f0a03c;
+  --prestado-tarjeta: #2a2418;
+  --coleccion-fondo: #33285c;
+  --coleccion-texto: #dccfff;
+  --coleccion-borde: #a58bf0;
+  --vencido-fondo: #5a1f1f;
+  --vencido-texto: #ffcfcc;
+  --vencido-borde: #ff7b72;
+  --vencido-tarjeta: #2e1c1e;
+
+  --exito-fondo: #17402a;
+  --exito-texto: #c3f3d5;
+  --exito-borde: #4cbf80;
+  --error-fondo: #4e1b1b;
+  --error-texto: #ffd2cf;
+  --error-borde: #ff7b72;
+  --info-fondo: #1b3552;
+  --info-texto: #cde2ff;
+  --info-borde: #8bb9ff;
+
+  --sombra: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --sombra-elevada: 0 10px 24px rgba(0, 0, 0, 0.6);
+}
+
 *,
 *::before,
 *::after {
@@ -697,6 +742,89 @@ textarea[aria-invalid="true"] {
 
 .mensaje__cerrar:hover {
   background: rgba(127, 127, 127, 0.25);
+}
+
+body,
+.cabecera,
+.pie,
+.tarjeta,
+.item,
+.estadistica,
+.formulario,
+.controles,
+.ajuste,
+.lista-simple,
+.vacio,
+input,
+select,
+textarea {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.boton,
+.menu__enlace {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.boton:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.tarjeta {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.tarjeta:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--sombra-elevada);
+}
+
+.item:hover {
+  box-shadow: var(--sombra-elevada);
+}
+
+@keyframes vista-entra {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mensaje-entra {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.vista {
+  animation: vista-entra 0.45s ease both;
+}
+
+.mensaje__caja {
+  animation: mensaje-entra 0.3s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .tarjeta:hover {
+    transform: none;
+  }
 }
 
 @media (max-width: 900px) {

@@ -14,10 +14,16 @@
     filtroGenero: 'todos',
     orden: { ...ORDEN_INICIAL },
     usuario: '',
+    tema: 'claro',
     editandoId: null
   };
 
   function guardar() {
+    Almacen.guardarDatos(estado);
+  }
+
+  function temaPorDefecto() {
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'oscuro' : 'claro';
   }
 
   function renderCatalogo(hoy) {
@@ -70,6 +76,7 @@
     UI.renderBotonesEstado(app.filtroEstado);
     UI.renderControlesOrden(app.orden);
     UI.renderUsuario(app.usuario);
+    UI.aplicarTema(app.tema);
   }
 
   function vistaDesdeHash() {
@@ -202,18 +209,27 @@
       app.usuario = '';
     }
     UI.mostrarErrorUsuario('');
+    Almacen.guardarUsuario(app.usuario);
     UI.renderUsuario(app.usuario);
     UI.renderMenu(Logica.prestamosActivos(estado.prestamos).length, app.usuario);
     UI.mostrarMensaje('exito', app.usuario ? `Nombre guardado: ${app.usuario}.` : 'Se quitó el nombre de usuario.');
   }
 
+  function alternarTema() {
+    app.tema = app.tema === 'oscuro' ? 'claro' : 'oscuro';
+    Almacen.guardarTema(app.tema);
+    UI.aplicarTema(app.tema);
+  }
+
   function restablecer() {
+    Almacen.borrarTodo();
     estado = Datos.crearIniciales(Fechas.hoy());
     app.busqueda = '';
     app.filtroEstado = 'todos';
     app.filtroGenero = 'todos';
     app.orden = { ...ORDEN_INICIAL };
     app.usuario = '';
+    app.tema = temaPorDefecto();
     cancelarEdicion();
     UI.mostrarErrorUsuario('');
     guardar();
@@ -223,6 +239,7 @@
   }
 
   function guardarOrden() {
+    Almacen.guardarOrden(app.orden);
   }
 
   function iniciarEventos() {
@@ -280,6 +297,7 @@
 
     $('formulario-usuario').addEventListener('submit', enviarFormularioUsuario);
     $('btn-restablecer').addEventListener('click', restablecer);
+    document.querySelectorAll('[data-accion="tema"]').forEach((boton) => boton.addEventListener('click', alternarTema));
 
     document.addEventListener('keydown', (evento) => {
       if (evento.key !== 'Escape') return;
@@ -291,7 +309,11 @@
   }
 
   function iniciar() {
-    estado = Datos.crearIniciales(Fechas.hoy());
+    const guardado = Almacen.cargarDatos();
+    estado = guardado || Datos.crearIniciales(Fechas.hoy());
+    app.usuario = Almacen.cargarUsuario();
+    app.orden = Almacen.cargarOrden() || { ...ORDEN_INICIAL };
+    app.tema = Almacen.cargarTema() || temaPorDefecto();
     guardar();
 
     UI.renderOpcionesGenero(Logica.GENEROS);
