@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Biblioteca Digital | Catálogo, préstamos y ajustes</title>
+  <meta name="description" content="Biblioteca Digital: administra un catálogo de libros, presta y devuelve ejemplares, agrega o edita títulos y consulta un resumen de tu biblioteca.">
+  <meta name="keywords" content="biblioteca, libros, préstamos, catálogo, devoluciones, HTML, CSS, JavaScript">
+  <meta name="author" content="Biblioteca Digital">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#1d4e89">
+  <meta name="color-scheme" content="light">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Biblioteca Digital">
+  <meta property="og:description" content="Catálogo de libros con préstamos, devoluciones e historial.">
+  <meta property="og:locale" content="es_ES">
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <link rel="stylesheet" href="css/styles.css">
+  <script defer src="js/fechas.js"></script>
+  <script defer src="js/logica.js"></script>
+  <script defer src="js/datos.js"></script>
+  <script defer src="js/ui.js"></script>
+  <script defer src="js/app.js"></script>
+</head>
+<body>
+  <a class="salto" href="#contenido">Saltar al contenido</a>
+
+  <header class="cabecera">
+    <div class="cabecera__marca">
+      <img src="assets/logo.svg" alt="Logotipo de Biblioteca Digital: un libro abierto" width="40" height="40">
+      <h1 class="cabecera__titulo">Biblioteca Digital</h1>
+    </div>
+    <nav class="menu" aria-label="Navegación principal">
+      <ul class="menu__lista">
+        <li><a class="menu__enlace" href="#catalogo" data-vista="catalogo">Catálogo</a></li>
+        <li><a class="menu__enlace" href="#prestamos" data-vista="prestamos">Mis préstamos <span id="contador-prestamos">(0)</span></a></li>
+        <li><a class="menu__enlace" href="#libro" data-vista="libro">Agregar libro</a></li>
+        <li><a class="menu__enlace" href="#resumen" data-vista="resumen">Resumen y ajustes</a></li>
+      </ul>
+    </nav>
+    <div class="cabecera__usuario">
+      <p class="saludo" id="saludo">Hola, visitante</p>
+    </div>
+  </header>
+
+  <main id="contenido" tabindex="-1">
+    <div id="mensaje" class="mensaje" role="status" aria-live="polite"></div>
+
+    <section id="vista-catalogo" class="vista" data-vista="catalogo" aria-labelledby="titulo-catalogo">
+      <h2 id="titulo-catalogo" class="vista__titulo" tabindex="-1">Catálogo de libros</h2>
+
+      <div class="controles" role="search" aria-label="Buscar, filtrar y ordenar libros">
+        <div class="campo campo--busqueda">
+          <label for="busqueda">Buscar por título o autor</label>
+          <input type="search" id="busqueda" autocomplete="off" placeholder="Ej. Borges">
+        </div>
+        <div class="campo">
+          <label for="filtro-genero">Género</label>
+          <select id="filtro-genero">
+            <option value="todos">Todos los géneros</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="orden-campo">Ordenar por</label>
+          <select id="orden-campo">
+            <option value="titulo">Título</option>
+            <option value="autor">Autor</option>
+            <option value="anio">Año</option>
+          </select>
+        </div>
+        <fieldset class="campo grupo-opciones">
+          <legend>Orden</legend>
+          <label class="opcion"><input type="radio" name="orden-direccion" value="asc" checked> Ascendente</label>
+          <label class="opcion"><input type="radio" name="orden-direccion" value="desc"> Descendente</label>
+        </fieldset>
+        <div class="campo campo--estado" role="group" aria-label="Filtrar por estado">
+          <button type="button" class="boton boton--filtro activo" data-estado="todos" aria-pressed="true">Todos</button>
+          <button type="button" class="boton boton--filtro" data-estado="disponibles" aria-pressed="false">Disponibles</button>
+          <button type="button" class="boton boton--filtro" data-estado="prestados" aria-pressed="false">Prestados</button>
+        </div>
+      </div>
+
+      <p id="contador-libros" class="contador" aria-live="polite"></p>
+      <div id="lista-libros" class="rejilla"></div>
+      <p id="vacio-libros" class="vacio" hidden></p>
+    </section>
+
+    <section id="vista-prestamos" class="vista" data-vista="prestamos" aria-labelledby="titulo-prestamos" hidden>
+      <h2 id="titulo-prestamos" class="vista__titulo" tabindex="-1">Mis préstamos</h2>
+      <p id="cupo-prestamos" class="contador"></p>
+      <ul id="lista-prestamos" class="lista"></ul>
+      <p id="vacio-prestamos" class="vacio" hidden>No hay ningún préstamo activo.</p>
+
+      <h3 class="vista__subtitulo">Historial</h3>
+      <ul id="lista-historial" class="lista"></ul>
+      <p id="vacio-historial" class="vacio" hidden>Todavía no hay préstamos devueltos en el historial.</p>
+    </section>
+
+    <section id="vista-libro" class="vista" data-vista="libro" aria-labelledby="titulo-libro" hidden>
+      <h2 id="titulo-libro" class="vista__titulo" tabindex="-1">Agregar libro</h2>
+      <form id="formulario-libro" class="formulario" novalidate>
+        <div class="campo">
+          <label for="campo-titulo">Título</label>
+          <input type="text" id="campo-titulo" name="titulo" autocomplete="off" aria-describedby="error-titulo">
+          <p class="error" id="error-titulo"></p>
+        </div>
+        <div class="campo">
+          <label for="campo-autor">Autor</label>
+          <input type="text" id="campo-autor" name="autor" autocomplete="off" aria-describedby="error-autor">
+          <p class="error" id="error-autor"></p>
+        </div>
+        <div class="campo">
+          <label for="campo-anio">Año</label>
+          <input type="number" id="campo-anio" name="anio" inputmode="numeric" aria-describedby="error-anio">
+          <p class="error" id="error-anio"></p>
+        </div>
+        <div class="campo">
+          <label for="campo-genero">Género</label>
+          <select id="campo-genero" name="genero" aria-describedby="error-genero">
+            <option value="">Selecciona un género</option>
+          </select>
+          <p class="error" id="error-genero"></p>
+        </div>
+        <div class="campo">
+          <label for="campo-comentario">Comentario (opcional)</label>
+          <textarea id="campo-comentario" name="comentario" rows="4" maxlength="120" aria-describedby="restantes-comentario error-comentario"></textarea>
+          <p class="ayuda" id="restantes-comentario">Quedan 120 caracteres</p>
+          <p class="error" id="error-comentario"></p>
+        </div>
+        <div class="campo">
+          <label class="opcion" for="campo-coleccion">
+            <input type="checkbox" id="campo-coleccion" name="coleccion" aria-describedby="error-coleccion">
+            Ejemplar de colección
+          </label>
+          <p class="error" id="error-coleccion"></p>
+        </div>
+        <div class="formulario__acciones">
+          <button type="submit" class="boton boton--primario" id="btn-guardar">Agregar libro</button>
+          <button type="button" class="boton boton--secundario" id="btn-cancelar-edicion" hidden>Cancelar</button>
+        </div>
+        <p class="ayuda">Pulsa Escape para limpiar el formulario y cancelar la edición.</p>
+      </form>
+    </section>
+
+    <section id="vista-resumen" class="vista" data-vista="resumen" aria-labelledby="titulo-resumen" hidden>
+      <h2 id="titulo-resumen" class="vista__titulo" tabindex="-1">Resumen y ajustes</h2>
+
+      <h3 class="vista__subtitulo">Resumen de la biblioteca</h3>
+      <ul id="resumen-estadisticas" class="estadisticas"></ul>
+
+      <h3 class="vista__subtitulo">Libros por género</h3>
+      <ul id="resumen-generos" class="lista-simple"></ul>
+      <p id="vacio-generos" class="vacio" hidden>No hay libros registrados.</p>
+
+      <h3 class="vista__subtitulo">Ajustes</h3>
+      <div class="ajustes">
+        <form id="formulario-usuario" class="ajuste" novalidate>
+          <h4>Nombre de usuario</h4>
+          <div class="campo">
+            <label for="campo-usuario">Tu nombre (de 2 a 40 caracteres)</label>
+            <input type="text" id="campo-usuario" name="usuario" autocomplete="given-name" aria-describedby="error-usuario">
+            <p class="error" id="error-usuario"></p>
+          </div>
+          <button type="submit" class="boton boton--primario">Guardar nombre</button>
+        </form>
+        <div class="ajuste">
+          <h4>Restablecer biblioteca</h4>
+          <p class="ayuda">Borra lo guardado y vuelve a los libros y préstamos iniciales.</p>
+          <button type="button" class="boton boton--peligro" id="btn-restablecer">Restablecer biblioteca</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <p>Biblioteca Digital &middot; Proyecto de Programación Web con HTML, CSS y JavaScript</p>
+  </footer>
+
+</body>
+</html>

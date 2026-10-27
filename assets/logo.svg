@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Libro abierto">
+  <rect width="64" height="64" rx="14" fill="#1d4e89"/>
+  <path d="M32 18c-5-3-12-4-20-3v31c8-1 15 0 20 3 5-3 12-4 20-3V15c-8-1-15 0-20 3z" fill="#ffffff"/>
+  <path d="M32 18v31" stroke="#1d4e89" stroke-width="2.5" fill="none"/>
+  <path d="M17 24c4-.3 8 .2 11 1.6M17 31c4-.3 8 .2 11 1.6M36 25.6c3-1.4 7-1.9 11-1.6M36 32.6c3-1.4 7-1.9 11-1.6" stroke="#1d4e89" stroke-width="2" stroke-linecap="round" fill="none"/>
+</svg>
